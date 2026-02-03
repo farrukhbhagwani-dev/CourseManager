@@ -241,9 +241,7 @@ public class CourseSwingView extends JFrame implements CourseView {
         btnUpdateSelected.setName("btnUpdateSelected");
         btnUpdateSelected.addActionListener(e -> new Thread(() -> {
             Course c = buildCourseFromFields();
-          //  if (c != null) {
                 courseController.updateCourse(c);
-           // }
         }).start());
 
         GridBagConstraints gbc_btnUpdateSelected = new GridBagConstraints();
@@ -257,9 +255,7 @@ public class CourseSwingView extends JFrame implements CourseView {
         btnDeleteSelected.setName("btnDeleteSelected");
         btnDeleteSelected.addActionListener(e -> new Thread(() -> {
             Course selectedCourse = listCourses.getSelectedValue();
-           // if (selectedCourse != null) {
                 courseController.deleteCourse(selectedCourse);
-           // }
         }).start());
 
         GridBagConstraints gbc_btnDeleteSelected = new GridBagConstraints();
@@ -356,7 +352,6 @@ public class CourseSwingView extends JFrame implements CourseView {
         txtInstructorName.setText("");
         txtCreditHours.setText("");
         txtDescription.setText("");
-      //  resetErrorLabel();
     }
 
     private String getDisplayString(Course c) {
@@ -364,7 +359,6 @@ public class CourseSwingView extends JFrame implements CourseView {
                 + " - " + c.getCreditHours() + " - " + c.getDescription();
     }
 
-    // Helper Functions
     private boolean isCourseCodeValid(String s) {
         return s != null && s.matches("^[A-Za-z]{3}\\d{3}$");
     }
