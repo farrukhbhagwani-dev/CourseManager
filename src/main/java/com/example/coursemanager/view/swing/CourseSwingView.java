@@ -241,7 +241,9 @@ public class CourseSwingView extends JFrame implements CourseView {
         btnUpdateSelected.setName("btnUpdateSelected");
         btnUpdateSelected.addActionListener(e -> new Thread(() -> {
             Course c = buildCourseFromFields();
+            if (c != null) {
                 courseController.updateCourse(c);
+            }
         }).start());
 
         GridBagConstraints gbc_btnUpdateSelected = new GridBagConstraints();
@@ -255,7 +257,9 @@ public class CourseSwingView extends JFrame implements CourseView {
         btnDeleteSelected.setName("btnDeleteSelected");
         btnDeleteSelected.addActionListener(e -> new Thread(() -> {
             Course selectedCourse = listCourses.getSelectedValue();
+            if (selectedCourse != null) {
                 courseController.deleteCourse(selectedCourse);
+            }
         }).start());
 
         GridBagConstraints gbc_btnDeleteSelected = new GridBagConstraints();
@@ -336,9 +340,11 @@ public class CourseSwingView extends JFrame implements CourseView {
     @Override
     public void showErrorMessage(String message, Course course) {
         SwingUtilities.invokeLater(() -> {
-        	String  displayMessage = course ==null ? "": getDisplayString(course); 
-            lblErrorMessage.setText(message + displayMessage );
-            listCourseModel.removeElement(course);
+            String displayMessage = (course == null) ? "" : getDisplayString(course);
+            lblErrorMessage.setText(message + displayMessage);
+            if (course != null) {
+                listCourseModel.removeElement(course);
+            }
         });
     }
 
@@ -360,16 +366,29 @@ public class CourseSwingView extends JFrame implements CourseView {
     }
 
     private boolean isCourseCodeValid(String s) {
-        return s != null && s.matches("^[A-Za-z]{3}\\d{3}$");
+        if (s == null) {
+            return false;
+        }
+        return s.matches("^[A-Za-z]{3}\\d{3}$");
     }
 
     private boolean isLettersAndSpaces(String s) {
-        return s != null && s.matches("^[a-zA-Z ]+$") && s.trim().length() > 0;
+        if (s == null) {
+            return false;
+        }
+        if (s.trim().length() == 0) {
+            return false;
+        }
+        return s.matches("^[a-zA-Z ]+$");
     }
 
     private boolean isNumeric(String s) {
-        return s != null && s.matches("^\\d+$");
+        if (s == null) {
+            return false;
+        }
+        return s.matches("^\\d+$");
     }
+
 
     private Course buildCourseFromFields() {
         String code = txtCourseCode.getText().trim();
