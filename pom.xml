@@ -13,7 +13,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-
+	<pitest-maven-version>1.5.2</pitest-maven-version>
     <junit.version>4.13.2</junit.version>
     <assertj.version>3.17.1</assertj.version>
     <mockito.version>4.4.0</mockito.version>
@@ -194,6 +194,64 @@
           </execution>
         </executions>
       </plugin>
+      
+      <plugin>
+		  <groupId>org.pitest</groupId>
+		  <artifactId>pitest-maven</artifactId>
+		  <version>${pitest-maven-version}</version>
+		
+		  <executions>
+		    <execution>
+		      <id>pitest</id>
+		      <phase>test</phase>
+		      <goals>
+		        <goal>mutationCoverage</goal>
+		      </goals>
+		    </execution>
+		  </executions>
+		
+		  <configuration>
+		    <targetClasses>
+		      <param>com.example.coursemanager.controller.*</param>
+		    </targetClasses>
+		
+		    <targetTests>
+		      <param>com.example.coursemanager.*</param>
+		    </targetTests>
+		
+		    <excludedClasses>
+		      <param>com.example.coursemanager.repository.**</param>
+		      <param>com.example.coursemanager.repository.mongo.**</param>
+		      <param>com.example.coursemanager.view.swing.**</param>
+		      <param>com.example.coursemanager.model.**</param>
+		      <param>com.example.coursemanager.app.swing.**</param>
+		    </excludedClasses>
+		
+		    <excludedTestClasses>
+		      <param>com.example.coursemanager.controller.racecondition.**</param>
+		      <param>com.example.coursemanager.repository.mongo.**</param>
+		      <param>com.example.coursemanager.view.swing.**</param>
+		      <param>com.example.coursemanager.bdd.**</param>
+		      <param>**/*IT*</param>
+		      <param>**/*E2E*</param>
+		      <param>**/*BDD*</param>
+		    </excludedTestClasses>
+		
+		    <mutators>
+		      <mutator>DEFAULTS</mutator>
+		    </mutators>
+		
+		    <mutationThreshold>80</mutationThreshold>
+		
+		    <outputFormats>
+		      <param>HTML</param>
+		    </outputFormats>
+		
+		    <failWhenNoMutations>false</failWhenNoMutations>
+		  </configuration>
+	  </plugin>
+
+
 
       <plugin>
         <groupId>io.fabric8</groupId>
