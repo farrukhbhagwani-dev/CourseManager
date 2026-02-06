@@ -376,7 +376,7 @@ public class CourseSwingView extends JFrame implements CourseView {
         if (s == null) {
             return false;
         }
-        if (s.trim().length() == 0) {
+        if (s.isEmpty()) {
             return false;
         }
         return s.matches("^[a-zA-Z ]+$");
