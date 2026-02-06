@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
+import static org.mockito.ArgumentMatchers.any;
 import com.example.coursemanager.controller.CourseController;
 import com.example.coursemanager.model.Course;
 
@@ -91,6 +91,13 @@ public class CourseSwingViewTest extends AssertJSwingJUnitTestCase {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n; i++) sb.append("a");
         return sb.toString();
+    }
+    
+    private boolean invokePrivateBooleanMethod(String methodName, String value) throws Exception {
+        java.lang.reflect.Method method =
+            CourseSwingView.class.getDeclaredMethod(methodName, String.class);
+        method.setAccessible(true);
+        return ((Boolean) method.invoke(courseSwingView, value)).booleanValue();
     }
 
     @Test
@@ -359,4 +366,104 @@ public class CourseSwingViewTest extends AssertJSwingJUnitTestCase {
 
         verify(courseController, never()).addCourse(COURSE);
     }
+    
+    @Test
+    @GUITest
+    public void testUpdateSelectedDoesNothingWhenFormIsInvalid() {
+        GuiActionRunner.execute(() -> courseSwingView.getListCourseModel().addElement(COURSE));
+        window.list("courseList").selectItem(0);
+
+        window.textBox("coursecodeTextBox").requireDisabled(); // selected mode
+        window.textBox("coursetitleTextBox").setText("123");   // invalid title
+
+        clickUpdateSelected();
+
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+            verify(courseController, never()).updateCourse(org.mockito.ArgumentMatchers.any(Course.class));
+        });
+    }
+
+    @Test
+    @GUITest
+    public void testDeleteSelectedDoesNothingWhenNoSelection() {
+        clickDeleteSelected();
+
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+            verify(courseController, never()).deleteCourse(org.mockito.ArgumentMatchers.any(Course.class));
+        });
+    }
+
+    @Test
+    @GUITest
+    public void testShowErrorMessageWithCourseRemovesThatCourseFromList() {
+        GuiActionRunner.execute(() -> courseSwingView.getListCourseModel().addElement(COURSE));
+
+        GuiActionRunner.execute(() ->
+            courseSwingView.showErrorMessage("Error: ", COURSE)
+        );
+
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+            assertThat(window.list("courseList").contents()).isEmpty();
+            window.label("errorMessageLabel").requireText("Error: " + COURSE.toString());
+        });
+    }
+    
+    @Test
+    @GUITest
+    public void testPrivateValidationMethodsWithNullInput() throws Exception {
+        assertThat(invokePrivateBooleanMethod("isCourseCodeValid", null)).isFalse();
+        assertThat(invokePrivateBooleanMethod("isLettersAndSpaces", null)).isFalse();
+        assertThat(invokePrivateBooleanMethod("isNumeric", null)).isFalse();
+    }
+    
+    @Test
+    @GUITest
+    public void testUpdateCourseWhenCourseCodeNotFoundDoesNotChangeList() {
+        GuiActionRunner.execute(() -> courseSwingView.getListCourseModel().addElement(COURSE));
+
+        Course notPresent =
+            new Course("APT999", "Networks", "Farrukh", 6, "Some desc");
+
+        GuiActionRunner.execute(() -> courseSwingView.updateCourse(notPresent));
+
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+            assertThat(window.list("courseList").contents())
+                .containsExactly(COURSE.toString());
+        });
+    }
+
+    @Test
+    @GUITest
+    public void testDeleteSelectedClickedWithNoSelectionDoesNotCallController() {
+        GuiActionRunner.execute(() -> courseSwingView.getListCourseModel().addElement(COURSE));
+
+        window.list("courseList").clearSelection();
+
+        GuiActionRunner.execute(() -> window.button("btnDeleteSelected").target().setEnabled(true));
+
+        clickDeleteSelected();
+
+        Awaitility.await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
+            verify(courseController, never()).deleteCourse(any(Course.class));
+        });
+    }
+
+    @Test
+    @GUITest
+    public void testWhenUpdatingAndCourseTitleIsOnlySpacesErrorMessageIsShown() {
+        GuiActionRunner.execute(() -> courseSwingView.getListCourseModel().addElement(COURSE));
+        window.list("courseList").selectItem(0);
+
+        window.textBox("coursetitleTextBox").setText("   ");
+
+        clickUpdateSelected();
+
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+            window.label("errorMessageLabel")
+                .requireText("Course Title must contain only letters and spaces");
+        });
+
+        verify(courseController, never()).updateCourse(org.mockito.ArgumentMatchers.any(Course.class));
+    }
+    
 }
