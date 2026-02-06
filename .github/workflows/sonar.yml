@@ -30,10 +30,11 @@ jobs:
 
       - name: Build with Maven and SonarCloud
         run: >
-          xvfb-run mvn verify -Pjacoco sonar:sonar
+          xvfb-run -a mvn verify -Pjacoco sonar:sonar
           -Dsonar.organization=farrukhbhagwani-dev
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.projectKey=farrukhbhagwani-dev_CourseManager
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
