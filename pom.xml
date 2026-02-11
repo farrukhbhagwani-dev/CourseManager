@@ -56,6 +56,11 @@
 			**/*E2E.java
 		</sonar.issue.ignore.multicriteria.e14.resourceKey>
 		
+		<sonar.coverage.exclusions>
+			**/model/*.*,
+			**/com/example/coursemanager/app/**
+		</sonar.coverage.exclusions>
+
 		<sonar.junit.reportPaths>
 			${project.build.directory}/surefire-reports,
 			${project.build.directory}/failsafe-reports
@@ -227,52 +232,63 @@
       </plugin>
       
       <plugin>
-  <groupId>org.pitest</groupId>
-  <artifactId>pitest-maven</artifactId>
-  <version>${pitest-maven-version}</version>
-  <executions>
-    <execution>
-      <id>pitest</id>
-      <phase>test</phase>
-      <goals>
-        <goal>mutationCoverage</goal>
-      </goals>
-    </execution>
-  </executions>
-  <configuration>
-    <targetClasses>
-      <param>com.example.coursemanager.controller.*</param>
-    </targetClasses>
-    <targetTests>
-      <param>com.example.coursemanager.controller.*</param>
-    </targetTests>
-    <excludedClasses>
-      <param>com.example.coursemanager.view.swing.*</param>
-      <param>com.example.coursemanager.app.*</param>
-      <param>com.example.coursemanager.app.swing.*</param>
-    </excludedClasses>
-    <excludedTestClasses>
-      <param>com.example.coursemanager.*IT</param>
-      <param>com.example.coursemanager.*BDD</param>
-      <param>com.example.coursemanager.*E2E</param>
-      <param>com.example.coursemanager.*.*IT</param>
-      <param>com.example.coursemanager.*.*BDD</param>
-      <param>com.example.coursemanager.*.*E2E</param>
-      <param>com.example.coursemanager.view.swing.*</param>
-      <param>com.example.coursemanager.view.swing.*Test</param>
-      <param>com.example.coursemanager.controller.racecondition.*</param>
-    </excludedTestClasses>
-    <mutators>
-      <mutator>DEFAULTS</mutator>
-    </mutators>
-    <mutationThreshold>80</mutationThreshold>
-    <outputFormats>
-      <param>HTML</param>
-    </outputFormats>
-  </configuration>
-</plugin>
+		<groupId>org.pitest</groupId>
+		<artifactId>pitest-maven</artifactId>
+		<version>${pitest-maven-version}</version>
+		<executions>
+			<execution>
+				<id>pitest</id>
+				<phase>test</phase>
+				<goals>
+					<goal>mutationCoverage</goal>
+				</goals>
+			</execution>
+		</executions>
+		<configuration>
+			<targetClasses>
+				<param>com.example.coursemanager.*.*</param>
+			</targetClasses>
+			<targetTests>
+				<param>com.example.coursemanager.*.*</param>
+			</targetTests>
+			<excludedClasses>
+				<param>
+					com.example.coursemanager.repository.**</param>
+				<param>
+					com.example.coursemanager.view.swing.**</param>
+				<param>
+					com.example.coursemanager.model.**</param>
+				<param>
+					com.example.coursemanager.app.**</param>
+
+			</excludedClasses>
+			<excludedTestClasses>
+				<param>
+					com.example.coursemanager.controller.**IT</param>
+				<param>
+					com.example.coursemanager.bdd.**</param>
+
+				<param>
+					com.example.coursemanager.**E2E</param>
+				<param>
+					com.example.coursemanager.repository.**</param>
+				<param>
+					com.example.coursemanager.view.swing.**</param>
+				<param>
+					com.example.coursemanager.controller.racecondition.**</param>
+			</excludedTestClasses>
+			<mutators>
+				<mutator>DEFAULTS</mutator>
+			</mutators>
+			<mutationThreshold>80</mutationThreshold>
+			<outputFormats>
+				<param>HTML</param>
+			</outputFormats>
+		</configuration>
+		</plugin>
 
       
+  
       <plugin>
         <groupId>io.fabric8</groupId>
         <artifactId>docker-maven-plugin</artifactId>
